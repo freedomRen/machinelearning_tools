@@ -1,0 +1,29 @@
+#!/usr/bin/python
+#
+#
+import sys, getopt
+import os
+import time
+
+
+outfiles = sys.argv[1:]
+templatefile = open("/data/taorui.ren/bin/pytemplate.py",'r')
+templateline = templatefile.readlines()
+templatefile.close()
+firstline = templateline[0].strip('\n')
+pythonbody = templateline[1:]
+user = os.environ.get("USER")
+
+for file in outfiles:
+    f = open(file,'w')
+    print >> f,firstline
+    print >> f,""
+    print >> f,"############################################"
+    print >> f,"# File: "+file
+    print >> f,"# create by "+user
+    print >> f,"# Time: "+time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
+    print >> f,"############################################"
+    print >> f,""
+    for line in pythonbody:
+    	print >> f,line.strip('\n')
+    f.close()
