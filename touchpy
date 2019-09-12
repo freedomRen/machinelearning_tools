@@ -1,0 +1,98 @@
+#!/usr/bin/python
+#
+#
+import sys, getopt
+import os
+import time
+
+first_vnum = sys.version.split('.')[0]
+outfiles = sys.argv[1:]
+templatefile = open(sys.path[0]+"/pytemplate.py",'r')
+templateline = templatefile.readlines()
+templatefile.close()
+firstline = templateline[0].strip('\n')
+pythonbody = templateline[1:]
+user = os.environ.get("USER")
+
+fathertemplate = None
+
+index = 0
+flag = 0
+while index < len(outfiles):
+    if flag == 1:
+        flag = 0
+        fathertemplate = outfiles[index]
+        outfiles.pop(index)
+        continue
+    if outfiles[index] == '-i' or outfiles[index] == '-f':
+        flag = 1
+        fathertemplate = None
+        outfiles.pop(index)
+        continue
+    index += 1
+
+for file in outfiles:
+    if fathertemplate == None:
+        f = open(file,'w')
+        if first_vnum == '2':
+            print >> f,firstline
+            print >> f,""
+            print >> f,"############################################"
+            print >> f,"# File: "+file
+            print >> f,"# create by "+user
+            print >> f,"# Time: "+time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
+            print >> f,"############################################"
+            print >> f,""
+            for line in pythonbody:
+                print >> f,line.strip('\n')
+        # else:
+        #     print(firstline, file=f)
+        #     print("",file=f)
+        #     print("############################################",file=f)
+        #     print("# File: "+file,file=f)
+        #     print("# create by "+user,file=f)
+        #     print("# Time: "+time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time())),file=f)
+        #     print("############################################",file=f)
+        #     print("",file=f)
+        #     for line in pythonbody:
+        #         print(line.strip('\n'), file=f)
+        f.close()
+    else:
+        fatherfile = open(fathertemplate,mode='r')
+        fatherline = fatherfile.readlines();
+        fatherfirstline = fatherline[0].strip('\n');
+        index = 0
+        count = 0
+        for line in fatherline:
+            count +=1;
+            if line.strip('\n') == "############################################":
+                index = count
+        fatherbody = fatherline[index:]
+        fatherfile.close()
+        f = open(file,'w')
+        if first_vnum == '2':
+            print >> f,fatherfirstline
+            print >> f,""
+            print >> f,"############################################"
+            print >> f,"# File: "+file
+            print >> f,"# Father: "+fathertemplate
+            print >> f,"# create by "+user
+            print >> f,"# Time: "+time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time()))
+            print >> f,"############################################"
+            for line in fatherbody:
+                print >> f,line.strip('\n')
+        # else:
+        #     print(fatherfirstline, file=f)
+        #     print("", file=f)
+        #     print("############################################", file=f)
+        #     print("# File: "+file, file=f)
+        #     print("# Father: "+fathertemplate, file=f)
+        #     print("# create by "+user, file=f)
+        #     print("# Time: "+time.strftime('%Y-%m-%d %H:%M',time.localtime(time.time())), file=f)
+        #     print("############################################", file=f)
+        #     for line in fatherbody:
+        #         print(line.strip('\n'), file=f)
+        f.close()
+
+    os.system("chmod +x %s" %(file))
+

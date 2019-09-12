@@ -1,0 +1,60 @@
+#!/usr/bin/python
+#
+#
+import sys, getopt
+import os
+import time
+import pickle
+
+inputfiles = sys.argv[1:]
+
+for filename in inputfiles:
+    print(filename)
+    with open(filename) as f:
+        obj = pickle.load(f)
+        if type(obj) is list:
+            print("list length:%d" %(len(obj)))
+            if type(obj[0]) is list:
+                print("type -> [ [..] ... ] shape: %d * %d" %(len(obj), len(obj[0])))
+                obj_len = len(obj)
+                if(obj_len >= 3):
+                    print "\033[1;35m%3d\033[0m: %s" %(0,str(obj[0]))
+                    print("... ...")
+                    print "\033[1;35m%3d\033[0m: %s" %(obj_len-1,str(obj[obj_len-1]))
+                else:
+                    for index in range(obj_len):
+                        print "\033[1;35m%3d\033[0m: %s" %(index,str(obj[index]))
+            else:
+                print("type -> [ ... ... ]")
+                obj_len = len(obj)
+                colmax_count = 20
+                row_count = obj_len/colmax_count + int(bool(obj_len%colmax_count))
+
+                if row_count <3:
+                    for index in range(row_count):
+                        begin = index*colmax_count
+                        end = (index+1)*colmax_count
+                        if end > obj_len:
+                            end = obj_len
+                        print("\033[1;35m%3d - %3d\033[0m: %s" %(begin, end-1,str(obj[begin:end])))
+                else:
+                    index = 0
+                    begin = index*colmax_count
+                    end = (index+1)*colmax_count
+                    if end > obj_len:
+                        end = obj_len
+                    print("\033[1;35m%3d - %3d\033[0m: %s" %(begin, end-1,str(obj[begin:end])))
+
+                    print("... ... ...")
+
+                    index = row_count-1
+                    begin = index*colmax_count
+                    end = (index+1)*colmax_count
+                    if end > obj_len:
+                        end = obj_len
+                    print("\033[1;35m%3d - %3d\033[0m: %s" %(begin, end-1,str(obj[begin:end])))
+
+        else:
+            print(obj)
+    f.close()
+
